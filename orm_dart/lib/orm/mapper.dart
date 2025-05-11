@@ -19,7 +19,7 @@ class OrmMapper {
             .firstWhere((m) => m.reflectee is Column)
             .reflectee as Column;
 
-        final typeStr = _dartTypeToSqlType(decl.type.reflectedType);
+        final typeStr = _dartTypeToSqlType(decl.type.reflectedType, primaryKey: columnAnn.primaryKey);
         final pk = columnAnn.primaryKey ? 'PRIMARY KEY' : '';
         fields.add('${columnAnn.name} $typeStr $pk');
       }
@@ -28,7 +28,8 @@ class OrmMapper {
     return 'CREATE TABLE IF NOT EXISTS ${tableAnnotation.name} (${fields.join(', ')});';
   }
 
-  static String _dartTypeToSqlType(Type t) {
+  static String _dartTypeToSqlType(Type t, {bool primaryKey = false}) {
+    if (t == int && primaryKey) return 'SERIAL';
     if (t == int) return 'INTEGER';
     if (t == String) return 'TEXT';
     throw UnsupportedError('Tipo $t não suportado');
