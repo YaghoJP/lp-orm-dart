@@ -28,6 +28,10 @@ class OrmMapper {
     return 'CREATE TABLE IF NOT EXISTS ${tableAnnotation.name} (${fields.join(', ')});';
   }
 
+  static String generateDropTableSql(Type type) {
+    return 'a';
+  }
+
   static String _dartTypeToSqlType(Type t, {bool primaryKey = false}) {
     if (t == int && primaryKey) return 'SERIAL';
     if (t == int) return 'INTEGER';
