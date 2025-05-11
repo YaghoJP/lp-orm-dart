@@ -1,0 +1,19 @@
+import 'package:postgres/postgres.dart';
+
+class Database {
+  static final _connection = PostgreSQLConnection(
+    'localhost',
+    5432,
+    'dart_orm',
+    username: 'dart_user',
+    password: 'senha123',
+  );
+
+  static Future<void> connect() async {
+    await _connection.open();
+    print('Conectado ao PostgreSQL');
+  }
+
+  static PostgreSQLConnection get connection => _connection;
+}
+
