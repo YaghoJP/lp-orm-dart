@@ -1,7 +1,8 @@
 import '../orm/annotations.dart';
+import '../orm/model.dart';
 
 @Table('users')
-class User {
+class User extends Model{
   @Column('id', primaryKey: true)
   int? id;
 
