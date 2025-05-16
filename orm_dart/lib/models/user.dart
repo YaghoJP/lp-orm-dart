@@ -12,6 +12,9 @@ class User extends Model{
   @Column('email')
   String email;
 
-  User({this.id, required this.name, required this.email});
+  @Column('idade')
+  int? idade;
+
+  User({this.id, required this.name, required this.email, this.idade});
 }
 

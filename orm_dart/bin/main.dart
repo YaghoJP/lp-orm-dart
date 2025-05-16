@@ -6,50 +6,58 @@ import 'package:orm_dart/orm/model.dart';
 void main() async {
   await Database.connect();
 
-  final sql = OrmMapper.generateCreateTableSql(User);
-  print('SQL gerado: $sql');
+  // DROP TABLE
+  final dropSql = OrmMapper.generateDropTableSql(User);
+  print('Executando DROP: $dropSql');
+  await Database.connection.execute(dropSql);
+  print('Tabela excluída (caso existisse).');
 
-  await Database.connection.execute(sql);
+  // CREATE TABLE
+  final createSql = OrmMapper.generateCreateTableSql(User);
+  print('Executando CREATE: $createSql');
+  await Database.connection.execute(createSql);
   print('Tabela criada com sucesso!');
-  print('');
 
-
-  //TESTE INSERT
+  // INSERT
   final user = User(name: 'Raquel', email: 'rr@hotmail.com');
   await user.save();
+  print('Usuário inserido com ID: ${user.id}');
 
-  print('Usuário salvo com id: ${user.id}');
-
-  print('');
-
-  //TESTE SELECT
-  print('Teste Select:');
+  // SELECT ALL
+  print('\nTodos os usuários após INSERT:');
   var users = await Model.all<User>(() => User(name: '', email: ''));
-  for(var u in users){
+  for (var u in users) {
     print('${u.id}, ${u.name}, ${u.email}');
   }
 
-  print('');
-
-  //TESTE UPDATE
+  // UPDATE
   user.name = 'Raquel Real';
   user.email = 'rreal@hotmail.com';
   await user.save();
-  print('Usuario ${user.id} atualizado!');
+  print('\nUsuário atualizado.');
 
   users = await Model.all<User>(() => User(name: '', email: ''));
-  for(var u in users){
+  print('Todos os usuários após UPDATE:');
+  for (var u in users) {
     print('${u.id}, ${u.name}, ${u.email}');
   }
 
-  print('');
+  // FIND BY ID
+  final found = await Model.findById<User>(user.id!, () => User(name: '', email: ''));
+  print('\nUsuário encontrado por ID ${user.id}:');
+  if (found != null) {
+    print('${found.id}, ${found.name}, ${found.email}');
+  } else {
+    print('Usuário não encontrado');
+  }
 
-  //TESTE DELETE
+  // DELETE
   await user.delete();
-  print('Usuário ${user.id} deletado com sucesso.');
+  print('\nUsuário ${user.id} deletado.');
 
   users = await Model.all<User>(() => User(name: '', email: ''));
-  for(var u in users){
+  print('Todos os usuários após DELETE:');
+  for (var u in users) {
     print('${u.id}, ${u.name}, ${u.email}');
   }
 
