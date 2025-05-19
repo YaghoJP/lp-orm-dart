@@ -25,20 +25,21 @@ void main() async {
 
   // SELECT ALL
   print('\nTodos os usuários após INSERT:');
-  var users = await Model.all<User>(() => User(name: '', email: ''));
-  for (var u in users) {
+  var allUsers = await Model.all<User>(() => User(name: '', email: ''));
+  for (var u in allUsers) {
     print('${u.id}, ${u.name}, ${u.email}');
   }
 
   // UPDATE
   user.name = 'Raquel Real';
   user.email = 'rreal@hotmail.com';
+  user.idade = 22;
   await user.save();
   print('\nUsuário atualizado.');
 
-  users = await Model.all<User>(() => User(name: '', email: ''));
+  var allUsers2 = await Model.all<User>(() => User(name: '', email: ''));
   print('Todos os usuários após UPDATE:');
-  for (var u in users) {
+  for (var u in allUsers2) {
     print('${u.id}, ${u.name}, ${u.email}');
   }
 
@@ -51,16 +52,25 @@ void main() async {
     print('Usuário não encontrado');
   }
 
+  // QUERY PERSONALIZADA
+  print("\nQuery Personalizada: ");
+  final filteredUsers = await User.query(
+    'SELECT id, name, email, idade FROM users WHERE idade > @idade',
+    {'idade': 18},
+  );
+  for (final user in filteredUsers) {
+    print('${user.name} (${user.idade} anos) - ${user.email}');
+  }
+
   // DELETE
   await user.delete();
   print('\nUsuário ${user.id} deletado.');
 
-  users = await Model.all<User>(() => User(name: '', email: ''));
+  final remainingUsers = await Model.all<User>(() => User(name: '', email: ''));
   print('Todos os usuários após DELETE:');
-  for (var u in users) {
+  for (var u in remainingUsers) {
     print('${u.id}, ${u.name}, ${u.email}');
   }
 
   print('Fim');
 }
-

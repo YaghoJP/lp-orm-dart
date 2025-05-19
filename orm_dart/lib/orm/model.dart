@@ -186,4 +186,49 @@ abstract class Model {
 
     return items;
   }
+
+  //Queries
+  static Future<List<T>> query<T extends Model>(
+  String sql, {
+  Map<String, dynamic>? substitutionValues,
+  required T Function() builder,
+}) async {
+  final instance = builder();
+  final mirror = reflect(instance);
+  final classMirror = mirror.type;
+
+  // Mapeia campos da classe -> nomes das colunas no banco
+  final columns = <String, String>{};
+  for (var decl in classMirror.declarations.values) {
+    if (decl is VariableMirror && decl.metadata.isNotEmpty) {
+      final colAnn = decl.metadata
+          .firstWhere((m) => m.reflectee is Column)
+          .reflectee as Column;
+      final fieldName = MirrorSystem.getName(decl.simpleName);
+      columns[fieldName] = colAnn.name;
+    }
+  }
+
+  final conn = Database.connection;
+  final result = await conn.query(sql, substitutionValues: substitutionValues);
+
+  final items = <T>[];
+  for (var row in result) {
+    final item = builder();
+    final itemMirror = reflect(item);
+
+    // Assumimos que SELECT traz as colunas na mesma ordem do mapeamento
+    int i = 0;
+    for (final field in columns.keys) {
+      if (i < row.length) {
+        itemMirror.setField(Symbol(field), row[i++]);
+      }
+    }
+
+    items.add(item);
+  }
+
+  return items;
+}
+
 }
