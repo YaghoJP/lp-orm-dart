@@ -149,7 +149,7 @@ abstract class Model {
     return instance as T;
   }
 
-    static Future<List<T>> all<T extends Model>(T Function() builder) async {
+  static Future<List<T>> all<T extends Model>(T Function() builder) async {
     final instance = builder();
     final mirror = reflect(instance);
     final classMirror = mirror.type;
@@ -188,8 +188,47 @@ abstract class Model {
     return items;
   }
 
+  static Future<List<T>> query<T extends Model>(
+    String sql, {
+    required T Function() builder,
+    Map<String, dynamic>? substitutionValues,
+  }) async {
+    final results = await Database.connection.query(
+      sql,
+      substitutionValues: substitutionValues,
+    );
+
+    return results.map((row) {
+      final instance = builder();
+      final mirror = reflect(instance);
+      final classMirror = mirror.type;
+
+      final fields = <String, Symbol>{};
+
+      for (var decl in classMirror.declarations.values) {
+        if (decl is VariableMirror && decl.metadata.isNotEmpty) {
+          final colAnn = decl.metadata
+              .firstWhere((m) => m.reflectee.runtimeType.toString() == 'Column')
+              .reflectee;
+
+          fields[(colAnn as dynamic).name] = decl.simpleName;
+        }
+      }
+
+      for (var i = 0; i < row.length; i++) {
+        final columnName = results.columnDescriptions[i].columnName;
+        final symbol = fields[columnName];
+        if (symbol != null) {
+          mirror.setField(symbol, row[i]);
+        }
+      }
+
+      return instance;
+    }).toList();
+  }
+
   static QueryBuilder<T> queryBuilder<T extends Model>(T Function() builder) {
-  return QueryBuilder<T>(builder);
-}
+    return QueryBuilder<T>(builder);
+  }
 
 }

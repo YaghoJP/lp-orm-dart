@@ -52,8 +52,18 @@ void main() async {
     print('Usuário não encontrado');
   }
 
+  // QUERY CUSTOMIZADA
+  var userAux1 = User(name: 'Joao', email: '', idade: 23);
+  await userAux1.save();
+  
+  var userAux2 = User(name: 'Yagho', email: '', idade: 21);
+  await userAux2.save();
+
+  var userAux3 = User(name: 'Bruna', email: '', idade: 16);
+  await userAux3.save();
+  
   print("\nQuery Builder (usuários com idade > 18):");
-  final results = await Model.queryBuilder<User>(() => User())
+  final results = await Model.queryBuilder<User>(() => User(name: '', email: ''))
       .whereGt('idade', 18)
       .orderBy('name')
       .get();
