@@ -6,7 +6,7 @@ class Database {
     5432,
     'dart_orm',
     username: 'postgres',
-    password: 'postgres',
+    password: '123',
   );
 
   static Future<void> connect() async {
