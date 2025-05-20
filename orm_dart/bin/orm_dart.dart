@@ -4,7 +4,7 @@ import 'package:orm_dart/models/models.dart';
 import 'package:orm_dart/orm/model.dart';
 
 
-void showResut(List<Map<String, dynamic>> list){
+void showResult(List<Map<String, dynamic>> list){
 
   for (var l in list){
     print(l);
@@ -48,6 +48,9 @@ void main() async {
       },
       {
         'name': 'Tom', 'email': 'jerry@gmail.com', 'idade': 23
+      },
+      {
+        'name': 'Erick :3', 'email': '',  'idade': 19
       }
     ]);  
 
@@ -55,7 +58,7 @@ void main() async {
     print('\nTodos os usuários após INSERT:');
     final users = await Orm.queryAll('User');
     //print(users);
-    showResut(users);
+    showResult(users);
     print('\n');
 
     print("\nQuery Builder (usuários com idade > 22):");
@@ -86,7 +89,7 @@ void main() async {
     print('Excluindo o User pelo ID  = 3');
     await Orm.delete('User', 3);
     final usersDelete = await Orm.queryAll('User');
-    showResut(usersDelete);
+    showResult(usersDelete);
     print('\n');
 
     print('----------Fim dos testes com User----------');
@@ -130,9 +133,18 @@ void main() async {
     // SELECT ALL
     print('\nTodos os usuários após INSERT:');
     final animals = await Orm.queryAll('Animal');
-    showResut(animals);
+    showResult(animals);
     print('\n');
 
+    // SELECT ORDER
+    print('\nTodos os animais por ordem alfabética');
+    final resultAnimals = await Orm.queryBuilder<Animal>(() => Animal())
+      .orderBy('name')
+      .get();
+
+    for (final animal in resultAnimals) {
+      print('${animal.name}');
+    }
 
     print('\nFazendo um Update no animal com ID = 4:');
     await Orm.update('Animal', {
@@ -152,7 +164,7 @@ void main() async {
     print('Excluindo o User pelo ID  = 3');
     await Orm.delete('Animal', 3);
     final animalsDelete = await Orm.queryAll('Animal');
-    showResut(animalsDelete);
+    showResult(animalsDelete);
     print('\n');
 
     print('----------Fim dos testes com User----------');
