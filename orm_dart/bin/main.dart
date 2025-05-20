@@ -52,14 +52,14 @@ void main() async {
     print('Usuário não encontrado');
   }
 
-  // QUERY PERSONALIZADA
-  print("\nQuery Personalizada: ");
-  final filteredUsers = await User.query(
-    'SELECT id, name, email, idade FROM users WHERE idade > @idade',
-    {'idade': 18},
-  );
-  for (final user in filteredUsers) {
-    print('${user.name} (${user.idade} anos) - ${user.email}');
+  print("\nQuery Builder (usuários com idade > 18):");
+  final results = await Model.queryBuilder<User>(() => User())
+      .whereGt('idade', 18)
+      .orderBy('name')
+      .get();
+
+  for (final user in results) {
+    print('${user.name} (${user.idade} anos)');
   }
 
   // DELETE
