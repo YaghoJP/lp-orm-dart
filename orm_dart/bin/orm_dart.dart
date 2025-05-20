@@ -58,6 +58,15 @@ void main() async {
     showResut(users);
     print('\n');
 
+    print("\nQuery Builder (usuários com idade > 22):");
+    final results = await Orm.queryBuilder<User>(() => User())
+        .whereGt('idade', 22)
+        .orderBy('name')
+        .get();
+
+    for (final user in results) {
+      print('${user.name} (${user.idade} anos)');
+    }
 
     print('\nFazendo um Update no usuário com ID = 4:');
     await Orm.update('User', {

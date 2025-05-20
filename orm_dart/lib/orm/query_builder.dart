@@ -1,6 +1,7 @@
 import 'dart:mirrors';
 import '../database.dart';
 import 'model.dart';
+import 'orm.dart';
 
 class QueryBuilder<T extends Model> {
     final T Function() builder;
@@ -63,7 +64,7 @@ class QueryBuilder<T extends Model> {
         sql += ' ORDER BY ${_order.join(', ')}';
         }
 
-        return await Model.query<T>(
+        return await Orm.query<T>(
         sql,
         substitutionValues: _substitutions,
         builder: builder,
