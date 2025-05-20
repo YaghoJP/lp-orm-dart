@@ -7,6 +7,16 @@ import 'model.dart';
 
 class Orm {
 
+  static ClassMirror getClassMirror(String className){
+    final libraryMirror = currentMirrorSystem().libraries.values.firstWhere(
+      (lib) => lib.declarations.containsKey(Symbol(className)),
+      orElse: () => throw Exception('Classe $className não encontrada.'),
+    );
+    final classMirror = libraryMirror.declarations[Symbol(className)] as ClassMirror;
+
+    return classMirror;
+  }
+
   //CREATE TABLE
   static Future<void> generateCreateTableSql(Type type) async { 
 
@@ -62,12 +72,7 @@ class Orm {
   static Future<List<Map<String, dynamic>>> queryAll(String className) async {
     try {
       
-      final libraryMirror = currentMirrorSystem().libraries.values.firstWhere(
-        (lib) => lib.declarations.containsKey(Symbol(className)),
-        orElse: () => throw Exception('Classe $className não encontrada.'),
-      );
-
-      final classMirror = libraryMirror.declarations[Symbol(className)] as ClassMirror;
+      final classMirror = getClassMirror(className);
 
       final tableAnn = classMirror.metadata
           .firstWhere((m) => m.reflectee is Table)
@@ -87,12 +92,8 @@ class Orm {
   static Future<void> insert(String className, List<Map<String, dynamic>> valuesList) async {
     try {
     
-      final libraryMirror = currentMirrorSystem().libraries.values.firstWhere(
-        (lib) => lib.declarations.containsKey(Symbol(className)),
-        orElse: () => throw Exception('Classe $className não encontrada.'),
-      );
 
-      final classMirror = libraryMirror.declarations[Symbol(className)] as ClassMirror;
+      final classMirror = getClassMirror(className);
 
       for (final data in valuesList) {
         final namedArgs = data.map((key, value) => MapEntry(Symbol(key), value));
@@ -108,12 +109,8 @@ class Orm {
   //UPDATE
   static Future<void> update(String className, Map<String, dynamic> values) async {
     try {
-      final libraryMirror = currentMirrorSystem().libraries.values.firstWhere(
-        (lib) => lib.declarations.containsKey(Symbol(className)),
-        orElse: () => throw Exception('Classe $className não encontrada.'),
-      );
 
-      final classMirror = libraryMirror.declarations[Symbol(className)] as ClassMirror;
+      final classMirror = getClassMirror(className);
 
       final namedArgs = values.map((key, value) => MapEntry(Symbol(key), value));
       final instance = classMirror.newInstance(Symbol(''), [], namedArgs).reflectee;
@@ -128,12 +125,8 @@ class Orm {
   //DELETE
   static Future<void> delete(String className, int id) async {
     try {
-      final libraryMirror = currentMirrorSystem().libraries.values.firstWhere(
-        (lib) => lib.declarations.containsKey(Symbol(className)),
-        orElse: () => throw Exception('Classe $className não encontrada.'),
-      );
 
-      final classMirror = libraryMirror.declarations[Symbol(className)] as ClassMirror;
+      final classMirror = getClassMirror(className);
 
       final instance = classMirror.newInstance(Symbol(''), [], {
         Symbol('id'): id,
@@ -149,12 +142,8 @@ class Orm {
   //Encontrar através do ID
   static Future<Map<String, dynamic>?> findById(String className, int id) async {
     try {
-      final libraryMirror = currentMirrorSystem().libraries.values.firstWhere(
-        (lib) => lib.declarations.containsKey(Symbol(className)),
-        orElse: () => throw Exception('Classe $className não encontrada.'),
-      );
 
-      final classMirror = libraryMirror.declarations[Symbol(className)] as ClassMirror;
+      final classMirror = getClassMirror(className);
 
       final tableAnn = classMirror.metadata
           .firstWhere((m) => m.reflectee is Table)

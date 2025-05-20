@@ -70,7 +70,7 @@ void main() async {
 
     print('Buscando User por ID = 3');
     final userFind = await Orm.findById('User', 3);
-    showResut(users);
+    print(userFind);
     print('\n');
 
 
