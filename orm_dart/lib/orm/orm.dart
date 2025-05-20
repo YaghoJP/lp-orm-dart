@@ -24,14 +24,12 @@ class Orm {
 
       final classMirror = reflectClass(type);
 
-      // Pega nome da tabela
       final tableAnnotation = classMirror.metadata
           .firstWhere((m) => m.reflectee is Table)
           .reflectee as Table;
 
       final fields = <String>[];
 
-      // Itera nos campos
       for (var decl in classMirror.declarations.values) {
         if (decl is VariableMirror && decl.metadata.isNotEmpty) {
           final columnAnn = decl.metadata
