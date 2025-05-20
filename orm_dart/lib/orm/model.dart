@@ -1,6 +1,7 @@
 import 'dart:mirrors';
 import '../database.dart';
 import 'annotations.dart';
+import 'query_builder.dart';
 
 abstract class Model {
 
