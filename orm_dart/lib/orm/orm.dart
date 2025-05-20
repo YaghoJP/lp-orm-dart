@@ -62,7 +62,6 @@ class Orm {
   static Future<List<Map<String, dynamic>>> queryAll(String className) async {
     try {
       
-      // 1. Encontra o Type correspondente ao nome da classe
       final libraryMirror = currentMirrorSystem().libraries.values.firstWhere(
         (lib) => lib.declarations.containsKey(Symbol(className)),
         orElse: () => throw Exception('Classe $className não encontrada.'),
@@ -70,17 +69,14 @@ class Orm {
 
       final classMirror = libraryMirror.declarations[Symbol(className)] as ClassMirror;
 
-      // 2. Lê a anotação da tabela
       final tableAnn = classMirror.metadata
           .firstWhere((m) => m.reflectee is Table)
           .reflectee as Table;
 
-      // 3. Executa o SELECT
       final result = await Database.connection.mappedResultsQuery(
         'SELECT * FROM ${tableAnn.name};',
       );
 
-      // 4. Formata os resultados como lista de dicionários
       return result.map((row) => row.values.first).toList();
     } catch (e) {
       throw Exception('Erro ao buscar registros de $className: $e');

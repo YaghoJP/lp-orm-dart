@@ -108,44 +108,4 @@ abstract class Model {
     }
   }
 
-  Future<List<Map<String, dynamic>>> all() async {
-    
-    final conn = Database.connection;
-
-    final mirror = reflect(this);
-    final classMirror = mirror.type;
-
-    final tableAnn = classMirror.metadata
-        .firstWhere((m) => m.reflectee is Table)
-        .reflectee as Table;
-
-    final columns = <String, String>{}; // campo -> nome coluna
-
-    for (var decl in classMirror.declarations.values) {
-      if (decl is VariableMirror && decl.metadata.isNotEmpty) {
-        final colAnn = decl.metadata
-            .firstWhere((m) => m.reflectee is Column)
-            .reflectee as Column;
-
-        final fieldName = MirrorSystem.getName(decl.simpleName);
-        columns[fieldName] = colAnn.name;
-      }
-    }
-
-
-    final result = await conn.query('SELECT * FROM ${tableAnn.name}');
-    //return registros;
-
-    final columnNames = columns.values.toList();
-
-    final registros = result.map((row) {
-    final map = <String, dynamic>{};
-    for (int i = 0; i < columns.length; i++) {
-      map[columnNames[i]!] = row[i];
-    }
-    return map;
-    }).toList();
-
-    return registros;
-  }
 }
